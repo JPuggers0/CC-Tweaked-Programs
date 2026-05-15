@@ -79,11 +79,11 @@ end
 
 local software = {
     {
-        name = "cash",
+        name = "cash_installer",
         url = "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Base%20Setup%20Programs/cash_installer.lua"
     },
     {
-        name = "consu",
+        name = "consu_installer",
         url = "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Base%20Setup%20Programs/CONSULT_installer.lua"
     },
 }
