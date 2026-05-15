@@ -79,11 +79,11 @@ end
 
 local software = {
     {
-        name = "cash_installer",
+        name = "cash",
         url = "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Base%20Setup%20Programs/cash_installer.lua"
     },
     {
-        name = "consu_installer",
+        name = "cosu",
         url = "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Base%20Setup%20Programs/CONSULT_installer.lua"
     },
 }
@@ -192,6 +192,6 @@ main:addButton({
     text = "[ Install Selected ]",
     background = colors.blue,
     foreground = colors.white,
-}):onClick(doInstall)
+}):onClick(doInstall())
 
 basalt.run()
