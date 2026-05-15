@@ -159,7 +159,7 @@ local function doInstall()
     basalt.stop()
     for _, sw in ipairs(toInstall) do
         print("Installing: " .. sw.name)
-        shell.run("wget", sw.url, sw.name .. ".lua")
+        shell.run("wget", "run", sw.url)
     end
     print("Done!")
     rebootWithMessage()
