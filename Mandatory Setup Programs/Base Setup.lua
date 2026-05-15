@@ -149,9 +149,7 @@ local function doInstall()
     if installing then return end
     installing = true
     basalt.stop()
-    print("checked: " .. tostring(checked[1]) .. ", " .. tostring(checked[2]))
-    os.pullEvent() -- pause so you can read it
-    -- flush any pending mouse/key events so the click doesn't bleed into installers
+    -- flush any pending mouse/key events
     while true do
         local e = {os.pullEvent()}
         if e[1] ~= "mouse_click" and e[1] ~= "mouse_up" and e[1] ~= "mouse_drag" then
@@ -159,18 +157,19 @@ local function doInstall()
         end
     end
     local toInstall = {}
-    for _, sw in ipairs(toInstall) do
-            print("Installing: " .. sw.name)
-            shell.run("wget", sw.url, sw.name .. "_installer.lua")
-            shell.run(sw.name .. "_installer.lua")
-            fs.delete(sw.name .. "_installer.lua")
+    for i, sw in ipairs(software) do
+        if checked[i] then
+            toInstall[#toInstall + 1] = sw
         end
+    end
     if #toInstall == 0 then
         print("No software selected.")
     else
         for _, sw in ipairs(toInstall) do
             print("Installing: " .. sw.name)
-            shell.run("wget", "run", sw.url)
+            shell.run("wget", sw.url, sw.name .. "_installer.lua")
+            shell.run(sw.name .. "_installer.lua")
+            fs.delete(sw.name .. "_installer.lua")
         end
         print("Done!")
         rebootWithMessage()
