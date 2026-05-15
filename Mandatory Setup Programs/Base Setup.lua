@@ -74,8 +74,6 @@ if not fs.exists("/libraries/basalt.lua") then
     )
 end
 
--- UI STAGE
-
 local software = {
     {
         name = "cash",
@@ -89,51 +87,95 @@ local software = {
 
 local basalt = require("/libraries/basalt")
 
+-- UI stage
 local main = basalt.getMainFrame()
+local W, H = term.getSize()
 
--- Title
-main:addLabel()
-    :setText("Select Software to Install")
-    :setPosition(2, 1)
+-- Title label
+main:addLabel({
+    x = 2, y = 1,
+    text = "Select software to install:",
+    foreground = colors.yellow,
+})
 
--- Correct scroll container (THIS is the real Basalt element)
-local scrollFrame = main:addScrollFrame()
-    :setPosition(2, 3)
-    :setSize(40, 12)
+-- Scrollable area for checkboxes (leave room for title + button)
+local scrollH = H - 4
+local scrollFrame = main:addScrollFrame({
+    x = 1, y = 2,
+    width = W - 1,
+    height = scrollH,
+    background = colors.black,
+})
 
+-- Track checked state and the checkbox elements
+local checked = {}
 local checkboxes = {}
 
--- Build checkbox list
-for i, item in ipairs(software) do
-    local cb = scrollFrame:addCheckbox()
-        :setText(item.name)
-        :setPosition(1, i)
-        :setValue(false)
-
-    checkboxes[#checkboxes + 1] = {
-        checkbox = cb,
-        data = item
-    }
+for i, sw in ipairs(software) do
+    checked[i] = false
+    local cb = scrollFrame:addCheckBox({
+        x = 2,
+        y = i,
+        text    = "[ ] " .. sw.name,
+        checkedText = "[x] " .. sw.name,
+        checked = false,
+        foreground = colors.white,
+        background = colors.black,
+    })
+    cb:onChange("checked", function(self, val)
+        checked[i] = val
+    end)
+    checkboxes[i] = cb
 end
 
--- Install button (outside scroll frame)
-main:addButton()
-    :setText("Install Selected")
-    :setPosition(2, 16)
-    :setSize(20, 1)
-    :onClick(function()
+-- Keyboard navigation: up/down moves focus, space toggles
+local focusIndex = 1
+local function updateFocus(newIdx)
+    focusIndex = newIdx
+    checkboxes[focusIndex]:setFocus()
+end
 
-        for _, entry in ipairs(checkboxes) do
-            if entry.checkbox:getValue() then
-                local item = entry.data
+basalt.onEvent("key", function(key)
+    if key == keys.down then
+        local next = math.min(focusIndex + 1, #checkboxes)
+        updateFocus(next)
+    elseif key == keys.up then
+        local prev = math.max(focusIndex - 1, 1)
+        updateFocus(prev)
+    end
+end)
 
-                print("Installing " .. item.name)
+-- Set initial keyboard focus to the first checkbox
+if #checkboxes > 0 then
+    checkboxes[1]:setFocus()
+end
 
-                shell.run("wget", "run", item.url)
-            end
+-- Install button at the bottom
+main:addButton({
+    x = 2,
+    y = H,
+    width = W - 2,
+    height = 1,
+    text = "Install Selected",
+    background = colors.blue,
+    foreground = colors.white,
+}):onClick(function()
+    basalt.stop()
+    local toInstall = {}
+    for i, sw in ipairs(software) do
+        if checked[i] then
+            toInstall[#toInstall + 1] = sw
         end
-
-        print("Done.")
-    end)
+    end
+    if #toInstall == 0 then
+        print("No software selected.")
+    else
+        for _, sw in ipairs(toInstall) do
+            print("Installing: " .. sw.name)
+            shell.run("wget", "run", sw.url)
+        end
+        print("Done!")
+    end
+end)
 
 basalt.run()
