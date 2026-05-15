@@ -139,8 +139,6 @@ display:onClick(function(self, btn, x, y)
     if installing then return end
     if y >= 1 and y <= #software then
         cursorIdx = y
-        checked[cursorIdx] = not checked[cursorIdx]
-        print("set checked["..cursorIdx.."] = "..tostring(checked[cursorIdx]))
         renderRows()
     end
 end)
@@ -149,7 +147,6 @@ local function doInstall()
     if installing then return end
     installing = true
     basalt.stop()
-    -- flush any pending mouse/key events
     while true do
         local e = {os.pullEvent()}
         if e[1] ~= "mouse_click" and e[1] ~= "mouse_up" and e[1] ~= "mouse_drag" then
@@ -189,8 +186,6 @@ basalt.onEvent("key", function(key)
             renderRows()
         end
     elseif key == keys.space then
-        checked[cursorIdx] = not checked[cursorIdx]
-        print("set checked["..cursorIdx.."] = "..tostring(checked[cursorIdx]))
         renderRows()
     elseif key == keys.enter then
         doInstall()
