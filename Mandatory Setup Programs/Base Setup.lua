@@ -1,6 +1,6 @@
 -- Check for --rebooted flag
 local args = { ... }
-local rebooted = false
+local rebooted = nil
 for _, v in ipairs(args) do
     if v == "--rebooted" then
         rebooted = true
