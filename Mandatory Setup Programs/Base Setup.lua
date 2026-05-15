@@ -103,18 +103,19 @@ local listContainer = main:addFrame()
 for i, program in ipairs(software) do
     local yPos = (i - 1) * 2 + 1
 
-    table.insert(checkboxes,
-        listContainer:addCheckbox()
-            :setPosition(2, yPos)
-            :setBackground(colors.lightGray)
-    )
+    local cb = basalt.addCheckbox()
+        :setParent(listContainer)
+        :setPosition(2, yPos)
+        :setBackground(colors.lightGray)
 
-    table.insert(labels,
-        listContainer:addLabel()
-            :setPosition(5, yPos)
-            :setText(program.name)
-            :setForeground(colors.white)
-    )
+    local lbl = basalt.addLabel()
+        :setParent(listContainer)
+        :setPosition(5, yPos)
+        :setText(program.name)
+        :setForeground(colors.white)
+
+    table.insert(checkboxes, cb)
+    table.insert(labels, lbl)
 end
 
 local function updateFocus()
