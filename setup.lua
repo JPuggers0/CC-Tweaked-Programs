@@ -1,0 +1,1 @@
+shell.run("wget", "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/refs/heads/master/Mandatory%20Setup%20Programs/Base%20Setup.lua", "sbm.lua") shell.run("sbm.lua") fs.delete("sbm.lua")
