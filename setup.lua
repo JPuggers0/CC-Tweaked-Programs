@@ -1,0 +1,1 @@
+shell.run("https://github.com/JPuggers0/CC-Tweaked-Programs/raw/refs/heads/master/Mandatory%20Setup%20Programs/Base%20Setup.lua")
