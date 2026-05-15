@@ -90,6 +90,8 @@ local software = {
 
 local basalt = require("/libraries/basalt")
 
+local installing = false
+
 -- UI Stage
 local main = basalt.getMainFrame()
 local W, H = term.getSize()
@@ -134,6 +136,7 @@ end
 renderRows()
 
 display:onClick(function(self, btn, x, y)
+    if installing then return end
     if y >= 1 and y <= #software then
         cursorIdx = y
         checked[cursorIdx] = not checked[cursorIdx]
@@ -142,7 +145,7 @@ display:onClick(function(self, btn, x, y)
 end)
 
 local function doInstall()
-    basalt.stop()
+    installing = true
     local toInstall = {}
     for i, sw in ipairs(software) do
         if checked[i] then
@@ -150,14 +153,15 @@ local function doInstall()
         end
     end
     if #toInstall == 0 then
-        print("No software selected.")
-    else
-        for _, sw in ipairs(toInstall) do
-            print("Installing: " .. sw.name)
-            shell.run("wget", "run", sw.url)
-        end
-        print("Done!")
+        installing = false
+        return
     end
+    basalt.stop()
+    for _, sw in ipairs(toInstall) do
+        print("Installing: " .. sw.name)
+        shell.run("wget", "run", sw.url)
+    end
+    print("Done!")
 end
 
 basalt.onEvent("key", function(key)
