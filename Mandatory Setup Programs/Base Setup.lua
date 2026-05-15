@@ -96,10 +96,9 @@ main:addLabel({
     text = "Select software to install:",
     foreground = colors.yellow,
 })
-
 main:addLabel({
     x = 2, y = 2,
-    text = "Up/Dn: move  Space: toggle  Enter: install",
+    text = "Up/Dn:move  Space:toggle  Enter:install",
     foreground = colors.gray,
 })
 
@@ -112,7 +111,7 @@ local scrollFrame = main:addScrollFrame({
 })
 
 local checked   = {}
-local buttons   = {}
+local rows      = {}   -- Label elements
 local cursorIdx = 1
 
 local function rowText(i)
@@ -120,37 +119,43 @@ local function rowText(i)
 end
 
 local function renderRows()
-    for i, btn in ipairs(buttons) do
-        btn:setText(rowText(i))
+    for i, lbl in ipairs(rows) do
+        lbl:setText(rowText(i))
         if i == cursorIdx then
-            btn:setBackground(colors.blue)
-            btn:setForeground(colors.white)
+            lbl:setBackground(colors.blue)
+            lbl:setForeground(colors.white)
         else
-            btn:setBackground(colors.black)
-            btn:setForeground(colors.white)
+            lbl:setBackground(colors.black)
+            lbl:setForeground(colors.white)
         end
     end
 end
 
-for i, sw in ipairs(software) do
+for i = 1, #software do
     checked[i] = false
-    local btn = scrollFrame:addButton({
+    local lbl = scrollFrame:addLabel({
         x = 1, y = i,
         width = W - 2,
-        height = 1,
         text = rowText(i),
         background = colors.black,
         foreground = colors.white,
     })
-    btn:onClick(function()
-        cursorIdx = i
-        checked[i] = not checked[i]
-        renderRows()
-    end)
-    buttons[i] = btn
+    rows[i] = lbl
 end
 
 renderRows()
+
+-- Mouse clicks on the scroll frame: figure out which row was clicked
+scrollFrame:onClick(function(self, btn, x, y)
+    -- y here is relative to the scrollFrame's visible top, need to account for scroll offset
+    local offsetY = scrollFrame:getOffsetY and scrollFrame:getOffsetY() or 0
+    local rowIdx = y + offsetY - 1  -- rows start at y=1 inside the frame
+    if rowIdx >= 1 and rowIdx <= #software then
+        cursorIdx = rowIdx
+        checked[cursorIdx] = not checked[cursorIdx]
+        renderRows()
+    end
+end)
 
 local function doInstall()
     basalt.stop()
