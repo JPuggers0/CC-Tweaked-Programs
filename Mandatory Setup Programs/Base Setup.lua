@@ -91,72 +91,115 @@ local basalt = require("/libraries/basalt")
 local main = basalt.getMainFrame()
 local W, H = term.getSize()
 
--- Title label
+-- Title
 main:addLabel({
     x = 2, y = 1,
     text = "Select software to install:",
     foreground = colors.yellow,
 })
 
--- Scrollable area for checkboxes (leave room for title + button)
-local scrollH = H - 4
+-- Hint line
+main:addLabel({
+    x = 2, y = 2,
+    text = "Up/Dn: move  Space: toggle  Enter: install",
+    foreground = colors.gray,
+})
+
+-- ScrollFrame for the checklist (rows 3 to H-1, leave row H for button)
+local scrollH = H - 3
 local scrollFrame = main:addScrollFrame({
-    x = 1, y = 2,
+    x = 1, y = 3,
     width = W - 1,
     height = scrollH,
     background = colors.black,
 })
 
--- Track checked state and the checkbox elements
-local checked = {}
-local checkboxes = {}
+-- State
+local checked  = {}
+local labels   = {}   -- the Label elements we update for visual feedback
+local cursorIdx = 1
 
+local function rowText(i)
+    local box = checked[i] and "[x]" or "[ ]"
+    return " " .. box .. " " .. software[i].name
+end
+
+local function renderRows()
+    for i, lbl in ipairs(labels) do
+        lbl:set("text", rowText(i))
+        if i == cursorIdx then
+            lbl:set("background", colors.blue)
+            lbl:set("foreground", colors.white)
+        else
+            lbl:set("background", colors.black)
+            lbl:set("foreground", colors.white)
+        end
+    end
+end
+
+-- Build one label per software entry; make them clickable via onClick on a Button
+-- We use Buttons (full-width, height 1) so mouse clicks work naturally
 for i, sw in ipairs(software) do
     checked[i] = false
-    local cb = scrollFrame:addCheckBox({
-        x = 2,
-        y = i,
-        text    = "[ ] " .. sw.name,
-        checkedText = "[x] " .. sw.name,
-        checked = false,
-        foreground = colors.white,
+    local btn = scrollFrame:addButton({
+        x = 1, y = i,
+        width = W - 2,
+        height = 1,
+        text = rowText(i),
         background = colors.black,
+        foreground = colors.white,
     })
-    cb:onChange("checked", function(self, val)
-        checked[i] = val
+    btn:onClick(function()
+        cursorIdx = i
+        checked[i] = not checked[i]
+        renderRows()
     end)
-    checkboxes[i] = cb
+    labels[i] = btn
 end
 
--- Keyboard navigation: up/down moves focus, space toggles
-local focusIndex = 1
-local function updateFocus(newIdx)
-    focusIndex = newIdx
-    checkboxes[focusIndex]:setFocus()
-end
+renderRows()
 
+-- Keyboard navigation
 basalt.onEvent("key", function(key)
-    if key == keys.down then
-        local next = math.min(focusIndex + 1, #checkboxes)
-        updateFocus(next)
-    elseif key == keys.up then
-        local prev = math.max(focusIndex - 1, 1)
-        updateFocus(prev)
+    if key == keys.up then
+        if cursorIdx > 1 then
+            cursorIdx = cursorIdx - 1
+            renderRows()
+        end
+    elseif key == keys.down then
+        if cursorIdx < #software then
+            cursorIdx = cursorIdx + 1
+            renderRows()
+        end
+    elseif key == keys.space then
+        checked[cursorIdx] = not checked[cursorIdx]
+        renderRows()
+    elseif key == keys.enter then
+        basalt.stop()
+        local toInstall = {}
+        for i, sw in ipairs(software) do
+            if checked[i] then
+                toInstall[#toInstall + 1] = sw
+            end
+        end
+        if #toInstall == 0 then
+            print("No software selected.")
+        else
+            for _, sw in ipairs(toInstall) do
+                print("Installing: " .. sw.name)
+                shell.run("wget", "run", sw.url)
+            end
+            print("Done!")
+        end
     end
 end)
 
--- Set initial keyboard focus to the first checkbox
---if #checkboxes > 0 then
---    checkboxes[1]:setFocus()
---end
-
--- Install button at the bottom
+-- Install button at the very bottom
 main:addButton({
-    x = 2,
-    y = H,
-    width = W - 2,
+    x = 1, y = H,
+    width = W,
     height = 1,
-    text = "Install Selected",
+    text = "[ Install Selected ]",
     background = colors.blue,
     foreground = colors.white,
 }):onClick(function()
