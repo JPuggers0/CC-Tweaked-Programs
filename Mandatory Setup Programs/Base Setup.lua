@@ -148,12 +148,7 @@ local function doInstall()
     if installing then return end
     installing = true
     basalt.stop()
-    while true do
-        local e = {os.pullEvent()}
-        if e[1] ~= "mouse_click" and e[1] ~= "mouse_up" and e[1] ~= "mouse_drag" then
-            break
-        end
-    end
+    sleep(0.1)
     local toInstall = {}
     for i, sw in ipairs(software) do
         if checked[i] then
