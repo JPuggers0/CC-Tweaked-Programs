@@ -110,7 +110,6 @@ for i = 1, #software do
     checked[i] = false
 end
 
--- A Display element gives us a raw writable surface — no states, no overrides
 local display = main:addDisplay({
     x = 1, y = 3,
     width = W,
@@ -119,20 +118,18 @@ local display = main:addDisplay({
 })
 
 local function renderRows()
-    display:clear(colors.black)
+    local win = display:getWindow()
+    win.setBackgroundColor(colors.black)
+    win.clear()
     for i = 1, #software do
-        local bg = (i == cursorIdx) and colors.blue or colors.black
-        local prefix = checked[i] and "[x] " or "[ ] "
-        display:setCursorPos(1, i)
-        display:setBackgroundColor(bg)
-        display:setTextColor(colors.white)
-        display:write((" " .. prefix .. software[i].name):sub(1, W))
+        local bg  = (i == cursorIdx) and colors.blue or colors.black
+        local txt = (" " .. (checked[i] and "[x] " or "[ ] ") .. software[i].name)
+        display:write(1, i, txt, colors.white, bg)
     end
 end
 
 renderRows()
 
--- Mouse clicks on the display: which row?
 display:onClick(function(self, btn, x, y)
     if y >= 1 and y <= #software then
         cursorIdx = y
