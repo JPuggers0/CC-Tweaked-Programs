@@ -17,41 +17,66 @@ end
     end
 
 -- Make sure previous user startup.lua is safe, then prepare for and start a reboot
-if rebooted == true then
-    fs.delete("/startup.lua")
-    if fn.exists("/startup.lua.bkp") then
-        fs.move("/startup.lua.bkp", "/startup.lua")
+local args = { ... }
+local rebooted = false
+
+for _, v in ipairs(args) do
+    if v == "--rebooted" then
+        rebooted = true
+        break
     end
-elseif fs.exists("/startup.lua.bkp") then
+end
+
+local STARTUP = "/startup.lua"
+local BACKUP  = "/startup.lua.bkp"
+
+local function rebootWithMessage()
+    print("Rebooting computer before continuing setup...")
+    sleep(2.5)
+    os.reboot()
+end
+
+-- If returning from reboot, restore backup
+if rebooted then
+    if fs.exists(BACKUP) then
+        if fs.exists(STARTUP) then
+            fs.delete(STARTUP)
+        end
+        fs.move(BACKUP, STARTUP)
+    end
+    return
+end
+
+-- Ensure reboot_helper is in place
+local function installRebootHelper()
     shell.run(
         "wget",
         "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/reboot_helper.lua",
-        "/startup.lua"
+        STARTUP
     )
-    print("Rebooting computer before continuing setup...")
-    os.startTimer(2.5)
-    os.reboot()
-elseif fs.exists("/startup.lua") then
-    fs.move("/startup.lua", "/startup.lua.bkp")
-    shell.run(
-        "wget",
-        "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/reboot_helper.lua",
-        "/startup.lua"
-    )
-    print("Rebooting computer before continuing setup...")
-    os.startTimer(2.5)
-    os.reboot()
-elseif not fs.exists("/startup.lua") and not fs.exists("/startup.lua.bkp") then
-    shell.run(
-        "wget",
-        "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/reboot_helper.lua",
-        "/startup.lua"
-    )
-    print("Rebooting computer before continuing setup...")
-    os.startTimer(2.5)
-    os.reboot()
+end
+
+-- Check if backup and reboot is needed
+if fs.exists(STARTUP) and not fs.exists(BACKUP) then
+    fs.move(STARTUP, BACKUP)
+    installRebootHelper()
+    rebootWithMessage()
+
+elseif fs.exists(BACKUP) and not fs.exists(STARTUP) then
+    installRebootHelper()
+    rebootWithMessage()
+
+elseif not fs.exists(STARTUP) and not fs.exists(BACKUP) then
+    installRebootHelper()
+    rebootWithMessage()
+
+elseif fs.exists(BACKUP) and fs.exists(STARTUP) then
+    -- Recovery case: clean duplicate state
+    fs.delete(STARTUP)
+    fs.move(BACKUP, STARTUP)
+
 else
-    print("Something went wrong\nStartup file check reached catch-all\nDebugging needed!")
+    print("Something went wrong: invalid startup state.")
     os.exit(1)
 end
 
