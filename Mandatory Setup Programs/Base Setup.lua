@@ -1,6 +1,6 @@
 -- Check for --rebooted flag
 local args = { ... }
-local rebooted = nil
+local rebooted = false
 for _, v in ipairs(args) do
     if v == "--rebooted" then
         rebooted = true
@@ -17,7 +17,7 @@ end
     end
 
 -- Make sure previous user startup.lua is safe, then prepare for and start a reboot
-if rebooted then
+if rebooted == true then
     fs.delete("/startup.lua")
     if fn.exists("/startup.lua.bkp") then
         fs.move("/startup.lua.bkp", "/startup.lua")
