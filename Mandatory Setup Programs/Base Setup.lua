@@ -34,6 +34,9 @@ if rebooted then
             fs.delete(STARTUP)
         end
         fs.move(BACKUP, STARTUP)
+    elseif fs.exists(STARTUP) then
+        -- No backup means there was no original startup.lua, just delete the helper
+        fs.delete(STARTUP)
     end
 end
 
