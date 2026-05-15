@@ -1,9 +1,47 @@
--- Install Basalt
-shell.run(
-    "wget",
-    "run",
-    "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/Basalt_installer.lua"
-)
+-- Check if Basalt is installed, if not install Basalt
+if not fs.exists("/libraries/basalt.lua") then
+    shell.run(
+        "wget",
+        "run",
+        "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/Basalt_installer.lua"
+    )
+end
+
+-- Make sure previous user startup.lua is safe, then prepare for and start a reboot
+if fs.exists("/startup.lua") and fs.exists("/startup.lua.bkp") then
+    fs.delete("/startup.lua")
+elseif fs.exists("/startup.lua.bkp") then
+    shell.run(
+        "wget",
+        "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/reboot_helper.lua",
+        "/startup.lua"
+    )
+    print("Rebooting computer before continuing setup...")
+    os.startTimer(2.5)
+    os.reboot()
+elseif fs.exists("/startup.lua") then
+    fs.move("/startup.lua", "/startup.lua.bkp")
+    shell.run(
+        "wget",
+        "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/reboot_helper.lua",
+        "/startup.lua"
+    )
+    print("Rebooting computer before continuing setup...")
+    os.startTimer(2.5)
+    os.reboot()
+elseif not fs.exists("/startup.lua") and not fs.exists("/startup.lua.bkp") then
+    shell.run(
+        "wget",
+        "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/reboot_helper.lua",
+        "/startup.lua"
+    )
+    print("Rebooting computer before continuing setup...")
+    os.startTimer(2.5)
+    os.reboot()
+else
+    print("Something went wrong\nStartup file check reached catch-all\nDebugging needed!")
+    os.exit(1)
+end
 
 local software = {
     {
@@ -17,7 +55,7 @@ local software = {
     },
 }
 
-local basalt = require("basalt")
+local basalt = require("/libraries/basalt")
 local main = basalt.createFrame()
 
 local checkboxes = {}
@@ -70,7 +108,7 @@ local function installerReboot()
 
     print(text)
 
-    os.sleep(1.5)
+    os.sleep(2.5)
     os.reboot()
 end
 
