@@ -91,21 +91,18 @@ local basalt = require("/libraries/basalt")
 local main = basalt.getMainFrame()
 local W, H = term.getSize()
 
--- Title
 main:addLabel({
     x = 2, y = 1,
     text = "Select software to install:",
     foreground = colors.yellow,
 })
 
--- Hint line
 main:addLabel({
     x = 2, y = 2,
     text = "Up/Dn: move  Space: toggle  Enter: install",
     foreground = colors.gray,
 })
 
--- ScrollFrame for the checklist (rows 3 to H-1, leave row H for button)
 local scrollH = H - 3
 local scrollFrame = main:addScrollFrame({
     x = 1, y = 3,
@@ -114,31 +111,27 @@ local scrollFrame = main:addScrollFrame({
     background = colors.black,
 })
 
--- State
-local checked  = {}
-local labels   = {}   -- the Label elements we update for visual feedback
+local checked   = {}
+local buttons   = {}
 local cursorIdx = 1
 
 local function rowText(i)
-    local box = checked[i] and "[x]" or "[ ]"
-    return " " .. box .. " " .. software[i].name
+    return " " .. (checked[i] and "[x] " or "[ ] ") .. software[i].name
 end
 
 local function renderRows()
-    for i, lbl in ipairs(labels) do
-        lbl:set("text", rowText(i))
+    for i, btn in ipairs(buttons) do
+        btn:setText(rowText(i))
         if i == cursorIdx then
-            lbl:set("background", colors.blue)
-            lbl:set("foreground", colors.white)
+            btn:setBackground(colors.blue)
+            btn:setForeground(colors.white)
         else
-            lbl:set("background", colors.black)
-            lbl:set("foreground", colors.white)
+            btn:setBackground(colors.black)
+            btn:setForeground(colors.white)
         end
     end
 end
 
--- Build one label per software entry; make them clickable via onClick on a Button
--- We use Buttons (full-width, height 1) so mouse clicks work naturally
 for i, sw in ipairs(software) do
     checked[i] = false
     local btn = scrollFrame:addButton({
@@ -154,55 +147,12 @@ for i, sw in ipairs(software) do
         checked[i] = not checked[i]
         renderRows()
     end)
-    labels[i] = btn
+    buttons[i] = btn
 end
 
 renderRows()
 
--- Keyboard navigation
-basalt.onEvent("key", function(key)
-    if key == keys.up then
-        if cursorIdx > 1 then
-            cursorIdx = cursorIdx - 1
-            renderRows()
-        end
-    elseif key == keys.down then
-        if cursorIdx < #software then
-            cursorIdx = cursorIdx + 1
-            renderRows()
-        end
-    elseif key == keys.space then
-        checked[cursorIdx] = not checked[cursorIdx]
-        renderRows()
-    elseif key == keys.enter then
-        basalt.stop()
-        local toInstall = {}
-        for i, sw in ipairs(software) do
-            if checked[i] then
-                toInstall[#toInstall + 1] = sw
-            end
-        end
-        if #toInstall == 0 then
-            print("No software selected.")
-        else
-            for _, sw in ipairs(toInstall) do
-                print("Installing: " .. sw.name)
-                shell.run("wget", "run", sw.url)
-            end
-            print("Done!")
-        end
-    end
-end)
-
--- Install button at the very bottom
-main:addButton({
-    x = 1, y = H,
-    width = W,
-    height = 1,
-    text = "[ Install Selected ]",
-    background = colors.blue,
-    foreground = colors.white,
-}):onClick(function()
+local function doInstall()
     basalt.stop()
     local toInstall = {}
     for i, sw in ipairs(software) do
@@ -219,6 +169,34 @@ main:addButton({
         end
         print("Done!")
     end
+end
+
+basalt.onEvent("key", function(key)
+    if key == keys.up then
+        if cursorIdx > 1 then
+            cursorIdx = cursorIdx - 1
+            renderRows()
+        end
+    elseif key == keys.down then
+        if cursorIdx < #software then
+            cursorIdx = cursorIdx + 1
+            renderRows()
+        end
+    elseif key == keys.space then
+        checked[cursorIdx] = not checked[cursorIdx]
+        renderRows()
+    elseif key == keys.enter then
+        doInstall()
+    end
 end)
+
+main:addButton({
+    x = 1, y = H,
+    width = W,
+    height = 1,
+    text = "[ Install Selected ]",
+    background = colors.blue,
+    foreground = colors.white,
+}):onClick(doInstall)
 
 basalt.run()
