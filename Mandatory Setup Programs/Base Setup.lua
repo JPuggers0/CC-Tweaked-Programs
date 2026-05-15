@@ -83,7 +83,7 @@ local software = {
         url = "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Base%20Setup%20Programs/cash_installer.lua"
     },
     {
-        name = "consult",
+        name = "consu",
         url = "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Base%20Setup%20Programs/CONSULT_installer.lua"
     },
 }
@@ -159,7 +159,7 @@ local function doInstall()
     basalt.stop()
     for _, sw in ipairs(toInstall) do
         print("Installing: " .. sw.name)
-        shell.run("wget", "run", sw.url)
+        shell.run("wget", sw.url, sw.name .. ".lua")
     end
     print("Done!")
     rebootWithMessage()
