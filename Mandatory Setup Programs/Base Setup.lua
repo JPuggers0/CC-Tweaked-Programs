@@ -136,7 +136,6 @@ end
 renderRows()
 
 display:onClick(function(self, btn, x, y)
-    print("display clicked: x="..x.." y="..y)
     if installing then return end
     if y >= 1 and y <= #software then
         cursorIdx = y
@@ -146,7 +145,16 @@ display:onClick(function(self, btn, x, y)
 end)
 
 local function doInstall()
+    if installing then return end
+    installing = true
     basalt.stop()
+    -- flush any pending mouse/key events so the click doesn't bleed into installers
+    while true do
+        local e = {os.pullEvent()}
+        if e[1] ~= "mouse_click" and e[1] ~= "mouse_up" and e[1] ~= "mouse_drag" then
+            break
+        end
+    end
     local toInstall = {}
     for i, sw in ipairs(software) do
         if checked[i] then
@@ -192,8 +200,6 @@ main:addButton({
     text = "[ Install Selected ]",
     background = colors.blue,
     foreground = colors.white,
-}):onClick(function()
-    doInstall()
-end)
+}):onClick(doInstall)
 
 basalt.run()
