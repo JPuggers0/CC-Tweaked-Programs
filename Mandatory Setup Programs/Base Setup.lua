@@ -109,12 +109,10 @@ for i, program in ipairs(software) do
 
     local btn = listContainer:addButton()
         :setPosition(2, yPos)
-        :setSize(3, 1)
+        :setSize(4, 1)
         :setText("[ ]")
-        :onClick(function()
-            states[i] = not states[i]
-            btn:setText(states[i] and "[X]" or "[ ]")
-        end)
+        :setBackground(colors.gray)
+        :setForeground(colors.white)
 
     table.insert(buttons, btn)
 
@@ -151,11 +149,11 @@ local function installerReboot()
 end
 
 local function runInstallation()
-    main:hide()
+    term.clear()
+    term.setCursorPos(1, 1)
 
     term.clear()
     print("Starting Bulk Installation...")
-    print("----------------------------")
 
     for i, cb in ipairs(checkboxes) do
         if cb:getValue() then
