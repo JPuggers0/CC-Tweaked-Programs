@@ -188,18 +188,28 @@ basalt.onEvent("key", function(key)
     end
 end)
 
-main:addButton({
-    x = 1, y = H - 1,
-    width = W,
-    height = 1,
-    text = "[ Install Selected ]",
-    background = colors.blue,
-    foreground = colors.white,
-}):onClick(function()
-    basalt.schedule(function()
-        print("detected click")
-        sleep(15)
-    end)
+--main:addButton({
+--    x = 1, y = H - 1,
+--    width = W,
+--    height = 1,
+--    text = "[ Install Selected ]",
+--    background = colors.blue,
+--    foreground = colors.white,
+--}):onClick(function()
+--    basalt.schedule(function()
+--        print("detected click")
+--        sleep(15)
+--    end)
+--end)
+
+local installBtn = main:addButton()
+installBtn:setPosition(1, H)
+installBtn:setSize(W, 1)
+installBtn:setText("[ Install Selected ]")
+installBtn:setBackground(colors.blue)
+installBtn:setForeground(colors.white)
+installBtn:onClick(function()
+    print("detected click")
 end)
 
 basalt.run()
