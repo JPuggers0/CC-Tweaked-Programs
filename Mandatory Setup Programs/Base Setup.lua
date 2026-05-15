@@ -1,15 +1,25 @@
--- Check if Basalt is installed, if not install Basalt
-if not fs.exists("/libraries/basalt.lua") then
-    shell.run(
-        "wget",
-        "run",
-        "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/Basalt_installer.lua"
-    )
+-- Check for --rebooted flag
+local args = { ... }
+local rebooted = false
+for _, v in ipairs(args) do
+    if v == "--rebooted" then
+        rebooted = true
+    end
 end
 
+    -- Check if Basalt is installed, if not install Basalt
+    if not fs.exists("/libraries/basalt.lua") then
+        shell.run(
+            "wget",
+            "run",
+            "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/Basalt_installer.lua"
+        )
+    end
+
 -- Make sure previous user startup.lua is safe, then prepare for and start a reboot
-if fs.exists("/startup.lua") and fs.exists("/startup.lua.bkp") then
+if rebooted = true then
     fs.delete("/startup.lua")
+    fs.move("/startup.lua.bkp", "/startup.lua")
 elseif fs.exists("/startup.lua.bkp") then
     shell.run(
         "wget",
