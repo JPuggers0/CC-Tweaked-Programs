@@ -107,7 +107,7 @@ main:addLabel({
     foreground = colors.gray,
 })
 
-local listH = H - 3
+local listH = H - 4
 local checked   = {}
 local cursorIdx = 1
 
@@ -189,7 +189,7 @@ basalt.onEvent("key", function(key)
 end)
 
 main:addButton({
-    x = 1, y = H,
+    x = 1, y = H - 1,
     width = W,
     height = 1,
     text = "[ Install Selected ]",
