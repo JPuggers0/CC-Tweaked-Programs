@@ -88,112 +88,65 @@ local software = {
 }
 
 local basalt = require("/libraries/basalt")
+
 local main = basalt.createFrame()
 
+main:setTheme({
+    FrameBG = colors.black,
+    FrameFG = colors.white,
+    CheckBoxBG = colors.gray,
+    CheckBoxFG = colors.white,
+    ButtonBG = colors.blue,
+    ButtonFG = colors.white,
+})
+
+-- Title
+main:addLabel()
+    :setText("Select Software to Install")
+    :setPosition(2, 1)
+
+-- Scrollable container
+local scrollFrame = main:addScrollableFrame()
+    :setPosition(2, 3)
+    :setSize("parent.w - 2", "parent.h - 5")
+    :setBackground(colors.black)
+
 local checkboxes = {}
-local labels = {}
-local buttons = {}
-local focusedIndex = 1
 
-local listContainer = main:addFrame()
-    :setScrollable(true)
-    :setPosition(2, 2)
-    :setSize(26, 12)
-    :setBackground(colors.gray)
+-- Build checkbox list
+for i, item in ipairs(software) do
+    local cb = scrollFrame:addCheckbox()
+        :setText(item.name)
+        :setPosition(1, i)
+        :setSize(20, 1)
 
-local states = {}
-
-for i, program in ipairs(software) do
-    local yPos = (i - 1) * 2 + 1
-    states[i] = false
-
-    local btn = listContainer:addButton()
-        :setPosition(2, yPos)
-        :setSize(4, 1)
-        :setText("[ ]")
-        :setBackground(colors.gray)
-        :setForeground(colors.white)
-
-    table.insert(buttons, btn)
-
-    local lbl = listContainer:addLabel()
-        :setPosition(6, yPos)
-        :setText(program.name)
-        :setForeground(colors.white)
-
-    table.insert(checkboxes, states) -- we reuse "checkboxes" later logically
-    table.insert(labels, lbl)
+    checkboxes[#checkboxes + 1] = {
+        checkbox = cb,
+        data = item
+    }
 end
 
-local function updateFocus()
-    for i, lbl in ipairs(labels) do
-        if i == focusedIndex then
-            lbl:setBackground(colors.blue)
-            listContainer:setOffset(0, (i - focusedIndex) * 2)
-        else
-            lbl:setBackground(colors.gray)
-        end
-    end
-end
+-- Install button
+main:addButton()
+    :setText("Install Selected")
+    :setPosition(2, "parent.h - 1")
+    :setSize(20, 1)
+    :onClick(function()
+        for _, entry in ipairs(checkboxes) do
+            if entry.checkbox:getValue() then
+                local item = entry.data
 
-local function installerReboot()
-    term.clear()
-    local w, h = term.getSize()
-    local text = "Rebooting..."
+                print("Installing " .. item.name .. "...")
 
-    term.setCursorPos(math.floor((w - #text) / 2) + 1, math.floor(h / 2) + 1)
-    print(text)
-
-    sleep(2.5)
-    os.reboot()
-end
-
-local function runInstallation()
-    term.clear()
-    term.setCursorPos(1, 1)
-
-    term.clear()
-    print("Starting Bulk Installation...")
-
-    for i, cb in ipairs(checkboxes) do
-        if cb:getValue() then
-            print("Installing: " .. software[i].name)
-            shell.run("wget", "run", software[i].url)
-        end
-    end
-
-    print("\nInstallation Complete!")
-    print("Press any key to reboot...")
-    os.pullEvent("key")
-
-    installerReboot()
-end
-
-while true do
-    local event, key = os.pullEvent("key")
-
-    if key == keys.up and focusedIndex > 1 then
-        focusedIndex = focusedIndex - 1
-        updateFocus()
-
-    elseif key == keys.down and focusedIndex < #software then
-        focusedIndex = focusedIndex + 1
-        updateFocus()
-
-    elseif key == keys.space then
-        states[focusedIndex] = not states[focusedIndex]
-
-        -- update button text if you're using toggle buttons
-        local btn = buttons[focusedIndex]
-        if btn then
-            btn:setText(states[focusedIndex] and "[X]" or "[ ]")
+                shell.run(
+                    "wget",
+                    "run",
+                    item.url
+                )
+            end
         end
 
-    elseif key == keys.enter then
-        runInstallation()
-        break
-    end
-end
+        print("Done installing selected software.")
+    end)
 
-updateFocus()
-basalt.run()
+basalt.autoUpdate()
