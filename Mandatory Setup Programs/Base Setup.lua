@@ -89,27 +89,17 @@ local software = {
 
 local basalt = require("/libraries/basalt")
 
-local main = basalt.createFrame()
-
-main:setTheme({
-    FrameBG = colors.black,
-    FrameFG = colors.white,
-    CheckBoxBG = colors.gray,
-    CheckBoxFG = colors.white,
-    ButtonBG = colors.blue,
-    ButtonFG = colors.white,
-})
+local main = basalt.getMainFrame()
 
 -- Title
 main:addLabel()
     :setText("Select Software to Install")
     :setPosition(2, 1)
 
--- Scrollable container
-local scrollFrame = main:addScrollableFrame()
+-- Correct scroll container (THIS is the real Basalt element)
+local scrollFrame = main:addScrollFrame()
     :setPosition(2, 3)
-    :setSize("parent.w - 2", "parent.h - 5")
-    :setBackground(colors.black)
+    :setSize(40, 12)
 
 local checkboxes = {}
 
@@ -118,7 +108,7 @@ for i, item in ipairs(software) do
     local cb = scrollFrame:addCheckbox()
         :setText(item.name)
         :setPosition(1, i)
-        :setSize(20, 1)
+        :setValue(false)
 
     checkboxes[#checkboxes + 1] = {
         checkbox = cb,
@@ -126,27 +116,24 @@ for i, item in ipairs(software) do
     }
 end
 
--- Install button
+-- Install button (outside scroll frame)
 main:addButton()
     :setText("Install Selected")
-    :setPosition(2, "parent.h - 1")
+    :setPosition(2, 16)
     :setSize(20, 1)
     :onClick(function()
+
         for _, entry in ipairs(checkboxes) do
             if entry.checkbox:getValue() then
                 local item = entry.data
 
-                print("Installing " .. item.name .. "...")
+                print("Installing " .. item.name)
 
-                shell.run(
-                    "wget",
-                    "run",
-                    item.url
-                )
+                shell.run("wget", "run", item.url)
             end
         end
 
-        print("Done installing selected software.")
+        print("Done.")
     end)
 
-basalt.autoUpdate()
+basalt.run()
