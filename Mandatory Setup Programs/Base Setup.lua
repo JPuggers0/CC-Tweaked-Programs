@@ -94,7 +94,8 @@ local checkboxes = {}
 local labels = {}
 local focusedIndex = 1
 
-local listContainer = main:addScrollableFrame()
+local listContainer = main:addFrame()
+    :setScrollable(true)
     :setPosition(2, 2)
     :setSize(26, 12)
     :setBackground(colors.gray)
@@ -120,7 +121,7 @@ local function updateFocus()
     for i, lbl in ipairs(labels) do
         if i == focusedIndex then
             lbl:setBackground(colors.blue)
-            listContainer:scrollTo((i - 1) * 2)
+            listContainer:setOffset(0, (i - focusedIndex) * 2)
         else
             lbl:setBackground(colors.gray)
         end
