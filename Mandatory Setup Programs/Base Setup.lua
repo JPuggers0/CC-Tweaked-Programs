@@ -156,11 +156,12 @@ local function doInstall()
         end
     end
     local toInstall = {}
-    for i, sw in ipairs(software) do
-        if checked[i] then
-            toInstall[#toInstall + 1] = sw
+    for _, sw in ipairs(toInstall) do
+            print("Installing: " .. sw.name)
+            shell.run("wget", sw.url, sw.name .. "_installer.lua")
+            shell.run(sw.name .. "_installer.lua")
+            fs.delete(sw.name .. "_installer.lua")
         end
-    end
     if #toInstall == 0 then
         print("No software selected.")
     else
