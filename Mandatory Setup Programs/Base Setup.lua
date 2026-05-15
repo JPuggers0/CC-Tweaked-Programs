@@ -107,7 +107,7 @@ main:addLabel({
     foreground = colors.gray,
 })
 
-local listH = H - 4
+local listH = H - 3
 local checked   = {}
 local cursorIdx = 1
 
@@ -188,28 +188,18 @@ basalt.onEvent("key", function(key)
     end
 end)
 
---main:addButton({
---    x = 1, y = H - 1,
---    width = W,
---    height = 1,
---    text = "[ Install Selected ]",
---    background = colors.blue,
---    foreground = colors.white,
---}):onClick(function()
---    basalt.schedule(function()
---        print("detected click")
---        sleep(15)
---    end)
---end)
+main:addLabel({
+    x = 1, y = H,
+    width = W,
+    text = "[ Install Selected ]",
+    background = colors.blue,
+    foreground = colors.white,
+})
 
-local installBtn = main:addButton()
-installBtn:setPosition(1, H)
-installBtn:setSize(W, 1)
-installBtn:setText("[ Install Selected ]")
-installBtn:setBackground(colors.blue)
-installBtn:setForeground(colors.white)
-installBtn:onClick(function()
-    print("detected click")
+basalt.onEvent("mouse_click", function(btn, x, y)
+    if y == H then
+        doInstall()
+    end
 end)
 
 basalt.run()
