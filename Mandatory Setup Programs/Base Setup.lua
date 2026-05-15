@@ -87,7 +87,7 @@ local software = {
 
 local basalt = require("/libraries/basalt")
 
--- UI stage
+-- UI Stage
 local main = basalt.getMainFrame()
 local W, H = term.getSize()
 
@@ -96,61 +96,50 @@ main:addLabel({
     text = "Select software to install:",
     foreground = colors.yellow,
 })
-
 main:addLabel({
     x = 2, y = 2,
     text = "Up/Dn: move  Space: toggle  Enter: install",
     foreground = colors.gray,
 })
 
-local scrollH = H - 3
-local scrollFrame = main:addScrollFrame({
+local listH = H - 3
+local checked   = {}
+local cursorIdx = 1
+
+for i = 1, #software do
+    checked[i] = false
+end
+
+-- A Display element gives us a raw writable surface — no states, no overrides
+local display = main:addDisplay({
     x = 1, y = 3,
-    width = W - 1,
-    height = scrollH,
+    width = W,
+    height = listH,
     background = colors.black,
 })
 
-local checked   = {}
-local buttons   = {}
-local cursorIdx = 1
-
-local function rowText(i)
-    return " " .. (checked[i] and "[x] " or "[ ] ") .. software[i].name
-end
-
 local function renderRows()
-    for i, btn in ipairs(buttons) do
-        btn:setText(rowText(i))
-        if i == cursorIdx then
-            btn:setBackground(colors.blue)
-            btn:setForeground(colors.white)
-        else
-            btn:setBackground(colors.black)
-            btn:setForeground(colors.white)
-        end
+    display:clear(colors.black)
+    for i = 1, #software do
+        local bg = (i == cursorIdx) and colors.blue or colors.black
+        local prefix = checked[i] and "[x] " or "[ ] "
+        display:setCursorPos(1, i)
+        display:setBackgroundColor(bg)
+        display:setTextColor(colors.white)
+        display:write((" " .. prefix .. software[i].name):sub(1, W))
     end
 end
 
-for i, sw in ipairs(software) do
-    checked[i] = false
-    local btn = scrollFrame:addButton({
-        x = 1, y = i,
-        width = W - 2,
-        height = 1,
-        text = rowText(i),
-        background = colors.black,
-        foreground = colors.white,
-    })
-    btn:onClick(function()
-        cursorIdx = i
-        checked[i] = not checked[i]
-        renderRows()
-    end)
-    buttons[i] = btn
-end
-
 renderRows()
+
+-- Mouse clicks on the display: which row?
+display:onClick(function(self, btn, x, y)
+    if y >= 1 and y <= #software then
+        cursorIdx = y
+        checked[cursorIdx] = not checked[cursorIdx]
+        renderRows()
+    end
+end)
 
 local function doInstall()
     basalt.stop()
