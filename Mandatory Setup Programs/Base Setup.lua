@@ -17,7 +17,7 @@ end
     end
 
 -- Make sure previous user startup.lua is safe, then prepare for and start a reboot
-if rebooted = true then
+if rebooted == true then
     fs.delete("/startup.lua")
     fs.move("/startup.lua.bkp", "/startup.lua")
 elseif fs.exists("/startup.lua.bkp") then
