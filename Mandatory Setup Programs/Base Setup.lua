@@ -145,7 +145,7 @@ display:onClick(function(self, btn, x, y)
 end)
 
 local function doInstall()
-    installing = true
+    if installing then return end
     local toInstall = {}
     for i, sw in ipairs(software) do
         if checked[i] then
@@ -153,18 +153,20 @@ local function doInstall()
         end
     end
     if #toInstall == 0 then
-        installing = false
         return
     end
+    installing = true
     basalt.stop()
     for _, sw in ipairs(toInstall) do
         print("Installing: " .. sw.name)
         shell.run("wget", "run", sw.url)
     end
     print("Done!")
+    rebootWithMessage()
 end
 
 basalt.onEvent("key", function(key)
+    if installing then return end
     if key == keys.up then
         if cursorIdx > 1 then
             cursorIdx = cursorIdx - 1
