@@ -19,7 +19,9 @@ end
 -- Make sure previous user startup.lua is safe, then prepare for and start a reboot
 if rebooted then
     fs.delete("/startup.lua")
-    fs.move("/startup.lua.bkp", "/startup.lua")
+    if fn.exists("/startup.lua.bkp") then
+        fs.move("/startup.lua.bkp", "/startup.lua")
+    end
 elseif fs.exists("/startup.lua.bkp") then
     shell.run(
         "wget",
