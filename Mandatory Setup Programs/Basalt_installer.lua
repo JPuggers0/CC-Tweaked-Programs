@@ -1,1 +1,1 @@
-shell.run("wget run https://raw.githubusercontent.com/Pyroxenium/Basalt2/main/install.lua -f")
+shell.run("wget", "https://raw.githubusercontent.com/Pyroxenium/Basalt2/main/install.lua", "sb2-2.lua") shell.run("sb2-2.lua", "-f") fs.delete("sb2-2.lua")

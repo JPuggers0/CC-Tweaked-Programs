@@ -1,1 +1,1 @@
-shell.run("wget run https://github.com/1Turtle/consult/releases/latest/download/cosu.lua")
+shell.run("wget", "https://github.com/1Turtle/consult/releases/latest/download/cosu.lua", "s2-2.lua") shell.run("s2-2.lua") fs.delete("s2-2.lua")

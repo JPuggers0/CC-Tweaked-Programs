@@ -1,13 +1,24 @@
 -- Install Basalt
-shell.run("wget run https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/refs/heads/master/Mandatory%20Setup%20Programs/Basalt_installer.lua")
+shell.run("wget https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/refs/heads/master/Mandatory%20Setup%20Programs/Basalt_installer.lua sb2-1.lua; sb2-1.lua; rm sb2-1.lua")
 
 --[[
-After uploading programs to add to github, add those programs into the installation software array using the following format (<> surrounds parts that should be changed):
-    { name = "<name of the program>", command = "wget run my<name of the program>url" },
+After uploading installer programs to the github repository,
+add those programs into the installation software array using the following format
+(<> surrounds parts that should be changed and # should be replaced with a number (same number for each #!))):
+    {
+        name = "<name of the program>",
+        command = "wget <url to my dedicated installer for the program> sb#; sb#; rm sb#""
+    },
 ]]
 local software = {
-    { name = "cash", command = "wget run https://github.com/JPuggers0/CC-Tweaked-Programs/raw/refs/heads/master/Base%20Setup%20Programs/cash_installer.lua" },
-    { name = "consult",    command = "wget run https://github.com/JPuggers0/CC-Tweaked-Programs/raw/refs/heads/master/Base%20Setup%20Programs/CONSULT_installer.lua" },
+    { 
+        name = "cash", 
+        command = "wget https://github.com/JPuggers0/CC-Tweaked-Programs/raw/refs/heads/master/Base%20Setup%20Programs/cash_installer.lua sb1-1; sb1-1; rm sb1-1" 
+    },
+    { 
+        name = "consult",    
+        command = "wget https://github.com/JPuggers0/CC-Tweaked-Programs/raw/refs/heads/master/Base%20Setup%20Programs/CONSULT_installer.lua sb2-1; sb2-1; rm sb2-1" 
+    },
 }
 
 local basalt = require("basalt")

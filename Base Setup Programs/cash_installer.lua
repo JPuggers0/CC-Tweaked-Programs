@@ -1,1 +1,1 @@
-shell.run("wget run https://raw.githubusercontent.com/MCJack123/cash/master/cash.lua cash.lua")
+shell.run("wget", "https://raw.githubusercontent.com/MCJack123/cash/master/cash.lua", "s1-2.lua") shell.run("s1-2.lua") fs.delete("s1-2.lua")
