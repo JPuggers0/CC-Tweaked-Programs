@@ -7,17 +7,17 @@ add those programs into the installation software array using the following form
 (<> surrounds parts that should be changed and # should be replaced with a number (same number for each #!))):
     {
         name = "<name of the program>",
-        command = "wget <url to my dedicated installer for the program> sb#; sb#; rm sb#""
+        command = "wget <url to my dedicated installer for the program> s#; s#; rm s#""
     },
-]]
+--]]
 local software = {
     { 
         name = "cash", 
-        command = "wget https://github.com/JPuggers0/CC-Tweaked-Programs/raw/refs/heads/master/Base%20Setup%20Programs/cash_installer.lua sb1-1; sb1-1; rm sb1-1" 
+        command = "wget https://github.com/JPuggers0/CC-Tweaked-Programs/raw/refs/heads/master/Base%20Setup%20Programs/cash_installer.lua s1-1; s1-1; rm s1-1" 
     },
     { 
         name = "consult",    
-        command = "wget https://github.com/JPuggers0/CC-Tweaked-Programs/raw/refs/heads/master/Base%20Setup%20Programs/CONSULT_installer.lua sb2-1; sb2-1; rm sb2-1" 
+        command = "wget https://github.com/JPuggers0/CC-Tweaked-Programs/raw/refs/heads/master/Base%20Setup%20Programs/CONSULT_installer.lua s2-1; s2-1; rm s2-1" 
     },
 }
 
