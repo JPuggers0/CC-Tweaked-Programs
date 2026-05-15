@@ -191,6 +191,6 @@ main:addButton({
     text = "[ Install Selected ]",
     background = colors.blue,
     foreground = colors.white,
-}):onClick(doInstall())
+}):onClick(function doInstall())
 
 basalt.run()
