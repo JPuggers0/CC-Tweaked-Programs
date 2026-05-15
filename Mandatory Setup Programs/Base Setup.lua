@@ -12,16 +12,6 @@ end
 local STARTUP = "/startup.lua"
 local BACKUP  = "/startup.lua.bkp"
 
--- Basalt install check (safe to run first)
-if not fs.exists("/libraries/basalt.lua") then
-    shell.run(
-        "wget",
-        "run",
-        "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/Basalt_installer.lua"
-    )
-end
-
--- Reboot helper install
 local function installRebootHelper()
     shell.run(
         "wget",
@@ -36,7 +26,8 @@ local function rebootWithMessage()
     os.reboot()
 end
 
--- Return-from-reboot handling
+-- Reboot Recovery
+
 if rebooted then
     if fs.exists(BACKUP) then
         if fs.exists(STARTUP) then
@@ -44,31 +35,43 @@ if rebooted then
         end
         fs.move(BACKUP, STARTUP)
     end
-else
+end
 
-    -- Ensure reboot helper + backup cycle
+-- Bootstrap and reboot preparations
+local needsReboot = false
+
+if not rebooted then
     if fs.exists(STARTUP) and not fs.exists(BACKUP) then
         fs.move(STARTUP, BACKUP)
         installRebootHelper()
-        rebootWithMessage()
-
-    elseif fs.exists(BACKUP) and not fs.exists(STARTUP) then
-        installRebootHelper()
-        rebootWithMessage()
+        needsReboot = true
 
     elseif not fs.exists(STARTUP) and not fs.exists(BACKUP) then
         installRebootHelper()
-        rebootWithMessage()
+        needsReboot = true
 
-    elseif fs.exists(BACKUP) and fs.exists(STARTUP) then
+    elseif fs.exists(BACKUP) and not fs.exists(STARTUP) then
+        installRebootHelper()
+        needsReboot = true
+
+    elseif fs.exists(STARTUP) and fs.exists(BACKUP) then
         fs.delete(STARTUP)
         fs.move(BACKUP, STARTUP)
     end
 end
 
--- Stop execution if reboot is happening
-if not rebooted and (fs.exists(STARTUP) and fs.exists(BACKUP) == false) then
-    return
+-- Reboot if required
+if needsReboot then
+    rebootWithMessage()
+end
+
+-- Basalt install check
+if not fs.exists("/libraries/basalt.lua") then
+    shell.run(
+        "wget",
+        "run",
+        "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/master/Mandatory%20Setup%20Programs/Basalt_installer.lua"
+    )
 end
 
 -- UI STAGE
@@ -146,7 +149,6 @@ local function runInstallation()
     for i, cb in ipairs(checkboxes) do
         if cb:getValue() then
             print("Installing: " .. software[i].name)
-
             shell.run("wget", "run", software[i].url)
         end
     end
