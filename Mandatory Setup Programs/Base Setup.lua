@@ -100,21 +100,27 @@ local listContainer = main:addFrame()
     :setSize(26, 12)
     :setBackground(colors.gray)
 
+local states = {}
+
 for i, program in ipairs(software) do
     local yPos = (i - 1) * 2 + 1
+    states[i] = false
 
-    local cb = basalt.addCheckbox()
-        :setParent(listContainer)
+    local btn = listContainer:addButton()
         :setPosition(2, yPos)
-        :setBackground(colors.lightGray)
+        :setSize(3, 1)
+        :setText("[ ]")
+        :onClick(function()
+            states[i] = not states[i]
+            btn:setText(states[i] and "[X]" or "[ ]")
+        end)
 
-    local lbl = basalt.addLabel()
-        :setParent(listContainer)
-        :setPosition(5, yPos)
+    local lbl = listContainer:addLabel()
+        :setPosition(6, yPos)
         :setText(program.name)
         :setForeground(colors.white)
 
-    table.insert(checkboxes, cb)
+    table.insert(checkboxes, states) -- we reuse "checkboxes" later logically
     table.insert(labels, lbl)
 end
 
