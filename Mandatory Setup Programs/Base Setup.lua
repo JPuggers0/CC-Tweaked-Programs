@@ -92,6 +92,7 @@ local main = basalt.createFrame()
 
 local checkboxes = {}
 local labels = {}
+local buttons = {}
 local focusedIndex = 1
 
 local listContainer = main:addFrame()
@@ -114,6 +115,8 @@ for i, program in ipairs(software) do
             states[i] = not states[i]
             btn:setText(states[i] and "[X]" or "[ ]")
         end)
+
+    table.insert(buttons, btn)
 
     local lbl = listContainer:addLabel()
         :setPosition(6, yPos)
@@ -168,7 +171,9 @@ local function runInstallation()
     installerReboot()
 end
 
-main:onKeyDown(function(_, _, key)
+while true do
+    local event, key = os.pullEvent("key")
+
     if key == keys.up and focusedIndex > 1 then
         focusedIndex = focusedIndex - 1
         updateFocus()
@@ -178,14 +183,19 @@ main:onKeyDown(function(_, _, key)
         updateFocus()
 
     elseif key == keys.space then
-        checkboxes[focusedIndex]:setValue(
-            not checkboxes[focusedIndex]:getValue()
-        )
+        states[focusedIndex] = not states[focusedIndex]
+
+        -- update button text if you're using toggle buttons
+        local btn = buttons[focusedIndex]
+        if btn then
+            btn:setText(states[focusedIndex] and "[X]" or "[ ]")
+        end
 
     elseif key == keys.enter then
         runInstallation()
+        break
     end
-end)
+end
 
 updateFocus()
 basalt.run()
