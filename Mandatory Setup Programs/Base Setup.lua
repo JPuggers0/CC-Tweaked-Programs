@@ -140,6 +140,7 @@ display:onClick(function(self, btn, x, y)
     if y >= 1 and y <= #software then
         cursorIdx = y
         checked[cursorIdx] = not checked[cursorIdx]
+        print("set checked["..cursorIdx.."] = "..tostring(checked[cursorIdx]))
         renderRows()
     end
 end)
@@ -190,6 +191,7 @@ basalt.onEvent("key", function(key)
         end
     elseif key == keys.space then
         checked[cursorIdx] = not checked[cursorIdx]
+        print("set checked["..cursorIdx.."] = "..tostring(checked[cursorIdx]))
         renderRows()
     elseif key == keys.enter then
         doInstall()
