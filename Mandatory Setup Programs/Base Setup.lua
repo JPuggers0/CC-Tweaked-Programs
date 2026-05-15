@@ -197,7 +197,8 @@ main:addButton({
     foreground = colors.white,
 }):onClick(function()
     basalt.schedule(function()
-        doInstall()
+        print("detected click")
+        sleep(15)
     end)
 end)
 
