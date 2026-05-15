@@ -1,5 +1,5 @@
 shell.run(
     "wget",
-    "run",
-    "https://raw.githubusercontent.com/MCJack123/cash/master/cash.lua"
+    "https://raw.githubusercontent.com/MCJack123/cash/master/cash.lua",
+    "cash.lua"
 )
