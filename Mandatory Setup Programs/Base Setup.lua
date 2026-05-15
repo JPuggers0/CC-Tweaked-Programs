@@ -194,6 +194,7 @@ main:addLabel({
     text = "[ Install Selected ]",
     background = colors.blue,
     foreground = colors.white,
+    backgroundEnabled = true,
 })
 
 basalt.onEvent("mouse_click", function(btn, x, y)
