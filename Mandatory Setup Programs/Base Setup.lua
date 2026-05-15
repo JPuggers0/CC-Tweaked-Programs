@@ -107,7 +107,7 @@ main:addLabel({
     foreground = colors.gray,
 })
 
-local listH = H - 3
+local listH = H - 2
 local checked   = {}
 local cursorIdx = 1
 
@@ -131,6 +131,10 @@ local function renderRows()
         local txt = (" " .. (checked[i] and "[x] " or "[ ] ") .. software[i].name)
         display:write(1, i, txt, colors.white, bg)
     end
+    local btnTxt = "[ Install Selected ]"
+    local pad = math.floor((W - #btnTxt) / 2)
+    display:write(1, listH, string.rep(" ", W), colors.white, colors.blue)
+    display:write(1 + pad, listH, btnTxt, colors.white, colors.blue)
 end
 
 renderRows()
@@ -187,15 +191,6 @@ basalt.onEvent("key", function(key)
         doInstall()
     end
 end)
-
-main:addLabel({
-    x = 1, y = H,
-    width = W,
-    text = "[ Install Selected ]",
-    background = colors.blue,
-    foreground = colors.white,
-    backgroundEnabled = true,
-})
 
 basalt.onEvent("mouse_click", function(btn, x, y)
     if y == H then
