@@ -1,5 +1,5 @@
 -- Install Basalt
-wget run "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/refs/heads/master/Mandatory%20Setup%20Programs/Basalt_installer.lua"
+shell.run(wget run "https://raw.githubusercontent.com/JPuggers0/CC-Tweaked-Programs/refs/heads/master/Mandatory%20Setup%20Programs/Basalt_installer.lua")
 
 --[[
 After uploading programs to add to github, add those programs into the installation software array using the following format (<> surrounds parts that should be changed):
