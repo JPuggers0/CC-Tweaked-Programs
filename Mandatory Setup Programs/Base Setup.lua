@@ -136,6 +136,7 @@ end
 renderRows()
 
 display:onClick(function(self, btn, x, y)
+    print("display clicked: x="..x.." y="..y)
     if installing then return end
     if y >= 1 and y <= #software then
         cursorIdx = y
