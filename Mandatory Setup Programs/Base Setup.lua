@@ -147,8 +147,6 @@ end)
 local function doInstall()
     if installing then return end
     installing = true
-    basalt.stop()
-    sleep(0.1)
     local toInstall = {}
     for i, sw in ipairs(software) do
         if checked[i] then
@@ -156,17 +154,18 @@ local function doInstall()
         end
     end
     if #toInstall == 0 then
-        print("No software selected.")
-    else
-        for _, sw in ipairs(toInstall) do
-            print("Installing: " .. sw.name)
-            shell.run("wget", sw.url, sw.name .. "_installer.lua")
-            shell.run(sw.name .. "_installer.lua")
-            fs.delete(sw.name .. "_installer.lua")
-        end
-        print("Done!")
-        rebootWithMessage()
+        installing = false
+        return
     end
+    basalt.stop()
+    for _, sw in ipairs(toInstall) do
+        print("Installing: " .. sw.name)
+        shell.run("wget", sw.url, sw.name .. "_installer.lua")
+        shell.run(sw.name .. "_installer.lua")
+        fs.delete(sw.name .. "_installer.lua")
+    end
+    print("Done!")
+    rebootWithMessage()
 end
 
 basalt.onEvent("key", function(key)
@@ -196,6 +195,10 @@ main:addButton({
     text = "[ Install Selected ]",
     background = colors.blue,
     foreground = colors.white,
-}):onClick(doInstall)
+}):onClick(function()
+    basalt.schedule(function()
+        doInstall()
+    end)
+end)
 
 basalt.run()
