@@ -145,11 +145,11 @@ basalt.onEvent("key", function(key)
     end
 end)
 
---[[ Set initial keyboard focus to the first checkbox
-if #checkboxes > 0 then
-    checkboxes[1]:setFocus()
-end
---]]
+-- Set initial keyboard focus to the first checkbox
+--if #checkboxes > 0 then
+--    checkboxes[1]:setFocus()
+--end
+
 -- Install button at the bottom
 main:addButton({
     x = 2,
