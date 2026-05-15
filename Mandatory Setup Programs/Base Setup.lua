@@ -139,6 +139,7 @@ display:onClick(function(self, btn, x, y)
     if installing then return end
     if y >= 1 and y <= #software then
         cursorIdx = y
+        checked[cursorIdx] = not checked[cursorIdx]
         renderRows()
     end
 end)
@@ -186,6 +187,7 @@ basalt.onEvent("key", function(key)
             renderRows()
         end
     elseif key == keys.space then
+        checked[cursorIdx] = not checked[cursorIdx]
         renderRows()
     elseif key == keys.enter then
         doInstall()
