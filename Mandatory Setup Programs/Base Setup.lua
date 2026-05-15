@@ -148,6 +148,8 @@ local function doInstall()
     if installing then return end
     installing = true
     basalt.stop()
+    print("checked: " .. tostring(checked[1]) .. ", " .. tostring(checked[2]))
+    os.pullEvent() -- pause so you can read it
     -- flush any pending mouse/key events so the click doesn't bleed into installers
     while true do
         local e = {os.pullEvent()}
